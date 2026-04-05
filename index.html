@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wound Depth Calculator — True-Graft Method</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1a5276;
+            --primary-light: #2980b9;
+            --accent: #27ae60;
+            --danger: #e74c3c;
+            --warn: #f39c12;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #dce4ec;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .card h2 .step {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .form-group input {
+            padding: 0.65rem 0.85rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+        }
+
+        .unit {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26,82,118,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--border);
+            padding: 0.7rem 1.5rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-light);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        /* Results */
+        #results {
+            display: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 600px) {
+            .result-grid { grid-template-columns: 1fr; }
+        }
+
+        .result-box {
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .result-box.traditional {
+            background: #fdf2f2;
+            border: 2px solid #f5c6cb;
+        }
+
+        .result-box.truegraft {
+            background: #eafaf1;
+            border: 2px solid #a9dfbf;
+        }
+
+        .result-box .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-box.traditional .label { color: var(--danger); }
+        .result-box.truegraft .label { color: var(--accent); }
+
+        .result-box .value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .result-box.traditional .value { color: var(--danger); }
+        .result-box.truegraft .value { color: var(--accent); }
+
+        .result-box .detail {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.35rem;
+        }
+
+        .overestimation-banner {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border: 2px solid var(--warn);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .overestimation-banner .factor {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #e65100;
+        }
+
+        .overestimation-banner .msg {
+            font-size: 0.9rem;
+            color: #bf360c;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .breakdown-table th {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .breakdown-table td {
+            padding: 0.6rem 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .breakdown-table tr:last-child td {
+            font-weight: 600;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag-red { background: #fde8e8; color: var(--danger); }
+        .tag-green { background: #e8f8f0; color: var(--accent); }
+
+        .info-text {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .info-text strong {
+            color: var(--text);
+        }
+
+        .how-to-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .how-to-list li {
+            padding: 0.6rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--bg);
+        }
+
+        .how-to-list li:last-child { border-bottom: none; }
+
+        .how-to-list li::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0.6rem;
+            background: var(--primary-light);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .history-section { margin-top: 1rem; }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 0.5rem;
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .history-table td {
+            padding: 0.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .history-table .savings-positive { color: var(--accent); font-weight: 600; }
+
+        .empty-history {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .history-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.75rem;
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-text:hover { text-decoration: underline; }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        footer a { color: var(--primary-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .disclaimer {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            font-size: 0.82rem;
+            color: #6d4c00;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Wound Depth Calculator</h1>
+    <p>Based on Dr. Shaun Carpenter's True-Graft Conformable Drape Method</p>
+</header>
+
+<div class="container">
+
+    <div class="disclaimer">
+        <strong>Clinical tool for professional use.</strong> This calculator compares traditional L&times;W&times;D estimation with the conformable drape method to reduce graft waste and improve measurement accuracy. Not a substitute for clinical judgement.
+    </div>
+
+    <!-- Step 1: Traditional Measurements -->
+    <div class="card">
+        <h2><span class="step">1</span> Traditional Wound Measurements</h2>
+        <p class="info-text" style="margin-bottom:1rem;">Enter the linear measurements taken with a ruler or probe at the wound's greatest dimensions.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="length">Length</label>
+                <input type="number" id="length" placeholder="e.g. 10.3" step="0.1" min="0">
+                <span class="unit">centimeters (cm)</span>
+            </div>
+            <div class="form-group">
+                <label for="width">Width</label>
+                <input type="number" id="width" placeholder="e.g. 7.9" step="0.1" min="0">
+                <span class="unit">centimeters (cm)</span>
+            </div>
+            <div class="form-group">
+                <label for="depth">Maximum Depth</label>
+                <input type="number" id="depth" placeholder="e.g. 3.2" step="0.1" min="0">
+                <span class="unit">centimeters (cm)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Conformable Drape Measurements -->
+    <div class="card">
+        <h2><span class="step">2</span> Conformable Drape Measurements</h2>
+        <p class="info-text" style="margin-bottom:1rem;">After pressing a sterile drape into the wound bed and tracing the edges, remove and flatten it. Measure the traced area and its perimeter.</p>
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label for="conform-area">Drape Conform Area (A<sub>conform</sub>)</label>
+                <input type="number" id="conform-area" placeholder="e.g. 95" step="0.1" min="0">
+                <span class="unit">square centimeters (cm&sup2;)</span>
+            </div>
+            <div class="form-group">
+                <label for="perimeter">Traced Perimeter</label>
+                <input type="number" id="perimeter" placeholder="e.g. 38" step="0.1" min="0">
+                <span class="unit">centimeters (cm)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Actual Volume -->
+    <div class="card">
+        <h2><span class="step">3</span> Actual Volume <span style="font-weight:400;font-size:0.85rem;color:var(--text-light);">(optional)</span></h2>
+        <p class="info-text" style="margin-bottom:1rem;">If you performed water/saline displacement to measure the true wound volume, enter it here to see the overestimation factor.</p>
+        <div class="form-grid-2">
+            <div class="form-group">
+                <label for="actual-volume">Measured Volume</label>
+                <input type="number" id="actual-volume" placeholder="e.g. 102" step="0.1" min="0">
+                <span class="unit">cubic centimeters (cm&sup3; / mL)</span>
+            </div>
+            <div class="form-group">
+                <label for="wound-location">Wound Location</label>
+                <input type="text" id="wound-location" placeholder="e.g. Sacral, Left heel">
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+        <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+    </div>
+
+    <!-- Results -->
+    <div id="results">
+        <div class="card" style="margin-top:1.5rem;">
+            <h2>Results</h2>
+
+            <div class="result-grid">
+                <div class="result-box traditional">
+                    <div class="label">Traditional (L&times;W&times;D)</div>
+                    <div class="value" id="res-traditional">—</div>
+                    <div class="detail">estimated volume (cm&sup3;)</div>
+                </div>
+                <div class="result-box truegraft">
+                    <div class="label">True-Graft Area Needed</div>
+                    <div class="value" id="res-truegraft">—</div>
+                    <div class="detail">total graft area (cm&sup2;)</div>
+                </div>
+            </div>
+
+            <div id="overestimation-banner" class="overestimation-banner" style="display:none;">
+                <div class="factor" id="res-overestimation">—</div>
+                <div class="msg" id="res-overestimation-msg">—</div>
+            </div>
+
+            <table class="breakdown-table">
+                <thead>
+                    <tr>
+                        <th>Measurement</th>
+                        <th>Value</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody id="breakdown-body">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Documentation Output -->
+        <div class="card">
+            <h2>Clinical Documentation</h2>
+            <p class="info-text" style="margin-bottom:0.75rem;">Copy this into the patient chart:</p>
+            <pre id="doc-output" style="background:var(--bg);padding:1rem;border-radius:8px;font-size:0.85rem;white-space:pre-wrap;border:1px solid var(--border);font-family:monospace;"></pre>
+        </div>
+    </div>
+
+    <!-- History -->
+    <div class="card history-section">
+        <h2>Measurement History</h2>
+        <div id="history-content">
+            <div class="empty-history">No measurements recorded yet. Results will appear here after calculation.</div>
+        </div>
+        <div class="history-actions" id="history-actions" style="display:none;">
+            <button class="btn-text" onclick="clearHistory()">Clear history</button>
+        </div>
+    </div>
+
+    <!-- How-To Guide -->
+    <div class="card">
+        <h2>How to Use the Conformable Drape Method</h2>
+        <ol class="how-to-list">
+            <li data-step="1"><strong>Lay</strong> a sterile surgical drape over the wound opening. Press it gently so it conforms to the <strong>entire</strong> wound bed — into the full depth, tunnels, undermined edges, and all irregular surfaces.</li>
+            <li data-step="2"><strong>Trace</strong> the wound margin on the drape with a surgical marking pen while it's still in the wound.</li>
+            <li data-step="3"><strong>Remove</strong> the drape carefully and lay it flat on a sterile surface.</li>
+            <li data-step="4"><strong>Measure</strong> the area inside the traced outline (overlay on graph paper or use a planimetry tool). Measure the perimeter of the outline.</li>
+            <li data-step="5"><strong>Enter</strong> the values into this calculator. The 0.5 cm fixation border for graft anchoring is added automatically.</li>
+        </ol>
+    </div>
+
+</div>
+
+<footer>
+    Based on methodology by <a href="https://www.linkedin.com/in/shaun-carpenter-md-cwsp-dabwms-2688b511" target="_blank" rel="noopener">Dr. Shaun Carpenter, MD, CWSP, DABWMS</a><br>
+    <a href="depth-measurement-formula.md">View full formula documentation</a>
+</footer>
+
+<script>
+    const FIXATION_BORDER = 0.5; // cm overlap for graft anchoring
+
+    let history = JSON.parse(localStorage.getItem('woundCalcHistory') || '[]');
+
+    function calculate() {
+        const L = parseFloat(document.getElementById('length').value);
+        const W = parseFloat(document.getElementById('width').value);
+        const D = parseFloat(document.getElementById('depth').value);
+        const aConform = parseFloat(document.getElementById('conform-area').value);
+        const perimeter = parseFloat(document.getElementById('perimeter').value);
+        const actualVol = parseFloat(document.getElementById('actual-volume').value);
+        const location = document.getElementById('wound-location').value.trim();
+
+        // Validate minimum inputs
+        if (isNaN(L) || isNaN(W) || isNaN(D)) {
+            alert('Please enter Length, Width, and Depth (Step 1).');
+            return;
+        }
+        if (isNaN(aConform) || isNaN(perimeter)) {
+            alert('Please enter the Conformable Drape Area and Perimeter (Step 2).');
+            return;
+        }
+
+        // Calculations
+        const traditionalVol = L * W * D;
+        const openingArea = L * W;
+        const fixationArea = perimeter * FIXATION_BORDER;
+        const totalGraftArea = aConform + fixationArea;
+
+        // Display results
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('res-traditional').textContent = traditionalVol.toFixed(1) + ' cm\u00B3';
+        document.getElementById('res-truegraft').textContent = totalGraftArea.toFixed(1) + ' cm\u00B2';
+
+        // Overestimation banner
+        const banner = document.getElementById('overestimation-banner');
+        if (!isNaN(actualVol) && actualVol > 0) {
+            const factor = traditionalVol / actualVol;
+            banner.style.display = 'block';
+            document.getElementById('res-overestimation').textContent = factor.toFixed(2) + '\u00D7 overestimation';
+            document.getElementById('res-overestimation-msg').textContent =
+                'Traditional L\u00D7W\u00D7D (' + traditionalVol.toFixed(1) + ' cm\u00B3) vs actual volume (' + actualVol.toFixed(1) + ' cm\u00B3)';
+        } else {
+            banner.style.display = 'none';
+        }
+
+        // Breakdown table
+        const rows = [
+            ['Wound opening (L \u00D7 W)', openingArea.toFixed(1) + ' cm\u00B2', '<span class="tag tag-red">Traditional</span>'],
+            ['Box volume (L \u00D7 W \u00D7 D)', traditionalVol.toFixed(1) + ' cm\u00B3', '<span class="tag tag-red">Traditional</span>'],
+        ];
+        if (!isNaN(actualVol) && actualVol > 0) {
+            rows.push(['Actual volume (displacement)', actualVol.toFixed(1) + ' cm\u00B3', 'Measured']);
+        }
+        rows.push(
+            ['Conform area (A_conform)', aConform.toFixed(1) + ' cm\u00B2', '<span class="tag tag-green">True-Graft</span>'],
+            ['Fixation border (' + perimeter.toFixed(1) + ' cm \u00D7 0.5 cm)', fixationArea.toFixed(1) + ' cm\u00B2', '<span class="tag tag-green">True-Graft</span>'],
+            ['Total graft area needed', totalGraftArea.toFixed(1) + ' cm\u00B2', '<span class="tag tag-green">True-Graft</span>']
+        );
+
+        document.getElementById('breakdown-body').innerHTML = rows
+            .map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>')
+            .join('');
+
+        // Documentation output
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        let doc = '';
+        doc += 'Wound Location: ' + (location || '[not specified]') + '\n';
+        doc += 'Date: ' + dateStr + '\n';
+        doc += 'Wound Opening: ' + L + ' \u00D7 ' + W + ' cm (' + openingArea.toFixed(1) + ' cm\u00B2)\n';
+        doc += 'Maximum Depth: ' + D + ' cm\n';
+        doc += 'Traditional Volume (L\u00D7W\u00D7D): ' + traditionalVol.toFixed(1) + ' cm\u00B3\n';
+        if (!isNaN(actualVol) && actualVol > 0) {
+            doc += 'Actual Volume (displacement): ' + actualVol.toFixed(1) + ' cm\u00B3\n';
+            doc += 'Overestimation Factor: ' + (traditionalVol / actualVol).toFixed(2) + '\u00D7\n';
+        }
+        doc += 'Conformable Surface Area: ' + aConform.toFixed(1) + ' cm\u00B2\n';
+        doc += 'Traced Perimeter: ' + perimeter.toFixed(1) + ' cm\n';
+        doc += 'Fixation Border: 0.5 cm\n';
+        doc += 'Total Graft Area Needed: ' + totalGraftArea.toFixed(1) + ' cm\u00B2\n';
+        doc += 'Measurement Method: Conformable drape (True-Graft methodology)';
+        document.getElementById('doc-output').textContent = doc;
+
+        // Save to history
+        const entry = {
+            date: dateStr,
+            location: location || '—',
+            lxwxd: traditionalVol.toFixed(1),
+            graftArea: totalGraftArea.toFixed(1),
+            actualVol: (!isNaN(actualVol) && actualVol > 0) ? actualVol.toFixed(1) : null,
+            overestimation: (!isNaN(actualVol) && actualVol > 0) ? (traditionalVol / actualVol).toFixed(2) : null
+        };
+        history.unshift(entry);
+        if (history.length > 50) history = history.slice(0, 50);
+        localStorage.setItem('woundCalcHistory', JSON.stringify(history));
+        renderHistory();
+
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function clearForm() {
+        document.querySelectorAll('input').forEach(input => input.value = '');
+        document.getElementById('results').style.display = 'none';
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('history-content');
+        const actions = document.getElementById('history-actions');
+
+        if (history.length === 0) {
+            container.innerHTML = '<div class="empty-history">No measurements recorded yet. Results will appear here after calculation.</div>';
+            actions.style.display = 'none';
+            return;
+        }
+
+        actions.style.display = 'flex';
+        let html = '<table class="history-table"><thead><tr>';
+        html += '<th>Date</th><th>Location</th><th>L&times;W&times;D</th><th>Graft Area</th><th>Overestimation</th>';
+        html += '</tr></thead><tbody>';
+
+        history.forEach(function(e) {
+            html += '<tr>';
+            html += '<td>' + e.date + '</td>';
+            html += '<td>' + e.location + '</td>';
+            html += '<td>' + e.lxwxd + ' cm&sup3;</td>';
+            html += '<td class="savings-positive">' + e.graftArea + ' cm&sup2;</td>';
+            html += '<td>' + (e.overestimation ? e.overestimation + '&times;' : '&mdash;') + '</td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    function clearHistory() {
+        if (confirm('Clear all measurement history?')) {
+            history = [];
+            localStorage.removeItem('woundCalcHistory');
+            renderHistory();
+        }
+    }
+
+    // Initial render
+    renderHistory();
+</script>
+
+</body>
+</html>
