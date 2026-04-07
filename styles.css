@@ -38,25 +38,36 @@ body {
 header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   color: #fff;
-  padding: 32px 0;
-  text-align: center;
+  padding: 20px 0;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .header-logo {
-  max-height: 80px;
-  margin-bottom: 12px;
+  height: 60px;
+  width: auto;
   border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.header-text {
+  text-align: left;
 }
 
 header h1 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 header .subtitle {
-  font-size: 0.95rem;
-  opacity: 0.85;
+  font-size: 0.88rem;
+  opacity: 0.8;
   font-weight: 400;
 }
 
@@ -546,40 +557,16 @@ footer .references a {
 }
 
 @media (max-width: 640px) {
-  header h1 {
-    font-size: 1.4rem;
-  }
-
-  .method-tabs {
-    flex-direction: column;
-  }
-
-  .tab {
-    text-align: center;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .result-row {
-    flex-direction: column;
-  }
-
-  .comparison-grid {
-    flex-direction: column;
-  }
-
-  .steps {
-    grid-template-columns: 1fr;
-  }
-
-  .graft-options {
-    flex-direction: column;
-  }
-
-  .graft-option {
-    min-width: unset;
-  }
+  .header-row { flex-direction: column; text-align: center; }
+  .header-text { text-align: center; }
+  header h1 { font-size: 1.3rem; }
+  .method-tabs { flex-direction: column; }
+  .tab { text-align: center; }
+  .form-row { flex-direction: column; gap: 12px; }
+  .result-row { flex-direction: column; }
+  .comparison-grid { flex-direction: column; }
+  .steps { grid-template-columns: 1fr; }
+  .graft-options { flex-direction: column; }
+  .graft-option { min-width: unset; }
+  .btn-row { flex-direction: column; }
 }
