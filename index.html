@@ -9,13 +9,13 @@
 <body>
   <header>
     <div class="container">
+      <img src="Untitled%20design%20(7).png" alt="Logo" class="header-logo">
       <h1>Wound Depth &amp; Graft Size Calculator</h1>
       <p class="subtitle">Based on Dr. Shaun Carpenter's True-Graft Conformable Drape Method</p>
     </div>
   </header>
 
   <main class="container">
-    <!-- Method Selector -->
     <section class="card method-selector">
       <h2>Select Measurement Method</h2>
       <div class="method-tabs">
@@ -26,7 +26,6 @@
       </div>
     </section>
 
-    <!-- Grid Overlay Method -->
     <section class="card method-panel active" id="method-grid">
       <h2>Grid Overlay Method</h2>
       <p class="method-desc">Place the conformed drape template over a 1 cm&sup2; wound measurement grid and count the squares.</p>
@@ -47,10 +46,12 @@
           <small>For 0.5 cm fixation edge calculation</small>
         </div>
       </div>
-      <button class="btn-calculate" onclick="calculateGrid()">Calculate Graft Area</button>
+      <div class="btn-row">
+        <button class="btn-calculate" onclick="calculateGrid()">Calculate Graft Area</button>
+        <button class="btn-reset" onclick="resetForm('method-grid')">Reset</button>
+      </div>
     </section>
 
-    <!-- Bounding Rectangle Method -->
     <section class="card method-panel" id="method-rectangle">
       <h2>Bounding Rectangle Method</h2>
       <p class="method-desc">Measure the longest length and widest width of the conformed drape template laid flat.</p>
@@ -71,10 +72,12 @@
           <small>For 0.5 cm fixation edge calculation. If left blank, perimeter is estimated as 2(L+W).</small>
         </div>
       </div>
-      <button class="btn-calculate" onclick="calculateRectangle()">Calculate Graft Area</button>
+      <div class="btn-row">
+        <button class="btn-calculate" onclick="calculateRectangle()">Calculate Graft Area</button>
+        <button class="btn-reset" onclick="resetForm('method-rectangle')">Reset</button>
+      </div>
     </section>
 
-    <!-- Elliptical Method -->
     <section class="card method-panel" id="method-elliptical">
       <h2>Elliptical Approximation</h2>
       <p class="method-desc">For roughly oval wounds. Measure the major and minor axes of the conformed drape template.</p>
@@ -95,10 +98,12 @@
           <small>If left blank, perimeter is approximated using Ramanujan's formula.</small>
         </div>
       </div>
-      <button class="btn-calculate" onclick="calculateElliptical()">Calculate Graft Area</button>
+      <div class="btn-row">
+        <button class="btn-calculate" onclick="calculateElliptical()">Calculate Graft Area</button>
+        <button class="btn-reset" onclick="resetForm('method-elliptical')">Reset</button>
+      </div>
     </section>
 
-    <!-- Traditional Method (for comparison) -->
     <section class="card method-panel" id="method-traditional">
       <h2>Traditional Method (L &times; W &times; D)</h2>
       <p class="method-desc warning-desc">This box-model method can overestimate wound volume by 2&ndash;3&times;. Shown here for comparison only.</p>
@@ -116,18 +121,18 @@
           <input type="number" id="trad-depth" min="0" step="0.1" placeholder="e.g. 3.2">
         </div>
       </div>
-      <button class="btn-calculate" onclick="calculateTraditional()">Calculate &amp; Compare</button>
+      <div class="btn-row">
+        <button class="btn-calculate" onclick="calculateTraditional()">Calculate &amp; Compare</button>
+        <button class="btn-reset" onclick="resetForm('method-traditional')">Reset</button>
+      </div>
     </section>
 
-    <!-- Results -->
     <section class="card results-card" id="results" style="display:none;">
       <h2>Results</h2>
-
       <div class="result-primary">
         <div class="result-label">Conformable Graft Area (A<sub>conform</sub>)</div>
         <div class="result-value" id="result-area">--</div>
       </div>
-
       <div class="result-row" id="fixation-row" style="display:none;">
         <div class="result-item">
           <div class="result-label">Fixation Edge (P &times; 0.5 cm)</div>
@@ -138,21 +143,16 @@
           <div class="result-value-sm highlight" id="result-total">--</div>
         </div>
       </div>
-
       <div class="result-row" id="total-no-fixation" style="display:none;">
         <div class="result-item full-width">
           <div class="result-label">Total Graft Area Needed</div>
           <div class="result-value-sm highlight" id="result-total-nf">--</div>
         </div>
       </div>
-
-      <!-- Graft Size Recommendation -->
       <div class="recommendation" id="recommendation">
         <h3>Recommended Graft Sheet Size</h3>
         <div class="graft-options" id="graft-options"></div>
       </div>
-
-      <!-- Traditional comparison warning -->
       <div class="comparison-box" id="comparison-box" style="display:none;">
         <h3>Comparison: Traditional vs. True-Graft</h3>
         <div class="comparison-grid">
@@ -171,8 +171,6 @@
         </div>
         <p class="warning-text">The traditional L&times;W&times;D method treats the wound as a rectangular box. Real wounds have irregular depth, sloped edges, and variable contours. Use the conformable drape method for accurate graft sizing.</p>
       </div>
-
-      <!-- Documentation Template -->
       <div class="doc-template">
         <h3>Documentation Template</h3>
         <button class="btn-copy" onclick="copyDocumentation()">Copy to Clipboard</button>
@@ -180,7 +178,6 @@
       </div>
     </section>
 
-    <!-- How It Works -->
     <section class="card info-card">
       <h2>How the True-Graft Method Works</h2>
       <div class="steps">
@@ -213,7 +210,6 @@
           </div>
         </div>
       </div>
-
       <div class="formula-box">
         <h3>Core Formula</h3>
         <div class="formula">Graft Area = A<sub>conform</sub> + (Perimeter &times; 0.5 cm)</div>
@@ -221,7 +217,6 @@
       </div>
     </section>
 
-    <!-- Saved Measurements -->
     <section class="card" id="history-card" style="display:none;">
       <h2>Saved Measurements</h2>
       <div id="history-list"></div>
@@ -245,3 +240,590 @@
   <script src="app.js"></script>
 </body>
 </html>
+
+styles.css — replace entirely with:
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #1a5276;
+  --primary-light: #2980b9;
+  --accent: #27ae60;
+  --accent-dark: #1e8449;
+  --danger: #c0392b;
+  --danger-light: #e74c3c;
+  --warning: #f39c12;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text: #2c3e50;
+  --text-light: #7f8c8d;
+  --border: #dce1e6;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  padding: 32px 0;
+  text-align: center;
+}
+
+.header-logo {
+  max-height: 80px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+header .subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-top: 24px;
+}
+
+.method-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.tab {
+  padding: 10px 18px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.tab.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.method-panel {
+  display: none;
+}
+
+.method-panel.active {
+  display: block;
+}
+
+.method-desc {
+  color: var(--text-light);
+  font-size: 0.92rem;
+  margin-bottom: 20px;
+}
+
+.warning-desc {
+  color: var(--danger);
+  font-weight: 500;
+  background: #fdf2f2;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 4px solid var(--danger);
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group .optional {
+  font-weight: 400;
+  color: var(--text-light);
+  font-size: 0.8rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+.form-group input::placeholder {
+  color: #bdc3c7;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text-light);
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.btn-calculate {
+  display: inline-block;
+  padding: 12px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-calculate:hover {
+  background: var(--accent-dark);
+}
+
+.btn-reset {
+  display: inline-block;
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-light);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reset:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 8px;
+}
+
+.btn-secondary:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-copy {
+  float: right;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-copy:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.results-card {
+  border-top: 4px solid var(--accent);
+}
+
+.result-primary {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.result-label {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.result-value {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.result-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.result-item {
+  flex: 1;
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.result-item.full-width {
+  flex: 1;
+}
+
+.result-value-sm {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.result-value-sm.highlight {
+  color: var(--accent-dark);
+}
+
+.recommendation {
+  margin: 24px 0;
+}
+
+.recommendation h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.graft-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.graft-option {
+  padding: 14px 20px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  min-width: 120px;
+  transition: all 0.2s;
+}
+
+.graft-option.recommended {
+  border-color: var(--accent);
+  background: #eafaf1;
+}
+
+.graft-option.recommended .graft-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.graft-option .graft-size {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.graft-option .graft-area {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.graft-option .graft-waste {
+  font-size: 0.78rem;
+  color: var(--warning);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.graft-option.too-small {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
+.comparison-box {
+  margin: 24px 0;
+  padding: 20px;
+  background: #fdf2f2;
+  border-radius: 8px;
+  border-left: 4px solid var(--danger);
+}
+
+.comparison-box h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: var(--danger);
+}
+
+.comparison-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.comp-item {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+}
+
+.comp-label {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+
+.comp-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.comp-value.danger {
+  color: var(--danger);
+}
+
+.warning-text {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.doc-template {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.doc-template h3 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.doc-template pre {
+  background: #f8f9fa;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--text);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.step-content h3 {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.step-content p {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.formula-box {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.formula-box h3 {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.formula {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: "Georgia", serif;
+}
+
+.formula-box p {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-top: 8px;
+}
+
+footer {
+  margin-top: 40px;
+  padding: 28px 0;
+  background: var(--primary);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-size: 0.84rem;
+}
+
+footer p {
+  margin-bottom: 6px;
+}
+
+footer .disclaimer {
+  font-size: 0.78rem;
+  opacity: 0.65;
+  max-width: 600px;
+  margin: 0 auto 6px;
+}
+
+footer .references a {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+
+.history-entry:last-child {
+  border-bottom: none;
+}
+
+.history-meta {
+  color: var(--text-light);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  .method-tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    text-align: center;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .result-row {
+    flex-direction: column;
+  }
+
+  .comparison-grid {
+    flex-direction: column;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .graft-options {
+    flex-direction: column;
+  }
+
+  .graft-option {
+    min-width: unset;
+  }
+}
