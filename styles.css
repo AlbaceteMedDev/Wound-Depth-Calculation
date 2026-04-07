@@ -60,6 +60,8 @@ header {
 
 .header-text {
   text-align: left;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  padding-left: 20px;
 }
 
 header h1 {
